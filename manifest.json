@@ -1,0 +1,21 @@
+{
+    "manifest_version": 2,
+
+    "name": "zhihu_answer_filter",
+    "description": "Supply lot's of useful filter when reading a question which have more than 500 or 1000 answers.",
+    "version": "1.0",
+
+    "permissions": [
+        "https://www.zhihu.com/",
+        "activeTab"
+    ],
+
+    "content_scripts": [
+        {
+            "matches": ["https://www.zhihu.com/question/*"],
+            "js": ["content_script.js"]
+        }
+    ]
+
+
+}
