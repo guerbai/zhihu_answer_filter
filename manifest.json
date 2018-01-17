@@ -9,7 +9,8 @@
         {
             "matches": ["https://www.zhihu.com/question/*"],
             "exclude_globs": ["*answer*"],
-            "js": ["filter.js"]
+            "js": ["jquery-3.2.1.min.js", "filter_provider.js"],
+            "run_at": "document_end"
         }
     ]
 
