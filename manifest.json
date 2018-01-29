@@ -9,7 +9,7 @@
         {
             "matches": ["https://www.zhihu.com/question/*"],
             "exclude_globs": ["*answer*"],
-            "js": ["lib/jquery-3.2.1.min.js", "lib/underscore-min.js", "zhihu_api.js", "index.js", "show.js", "deal_answer.js", "button.js"],
+            "js": ["lib/jquery-3.2.1.min.js", "lib/underscore-min.js", "answer.js", "zhihu_api.js", "index.js", "show.js", "deal_answer.js", "button.js"],
             "run_at": "document_end"
         }
     ]

@@ -1,12 +1,14 @@
 let sortByVoteUpCount = () => {
     hideOriginAnswerCards()
     if (!totalAnswerGot) {
+        console.log('not end')
         setTimeout(sortByVoteUpCount, 1000)
         return
     }
     let mostVoteUpAnswer = _.sortBy(answerList, function (answer) {
         return -answer.voteup_count
     }).slice(0, 50)
+    romanceAnswer(mostVoteUpAnswer)
     console.log(mostVoteUpAnswer)
 }
 
@@ -20,6 +22,7 @@ let filterByAuthor = () => {
     let authorAnswer = _.filter(answerList, function (answer) {
         return answer.author.name.indexOf(author) > -1
     })
+    romanceAnswer(authorAnswer)
     console.log(authorAnswer)
     for (let answer of authorAnswer) {
         console.log(answer.author.name)
