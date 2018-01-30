@@ -1,5 +1,6 @@
 let sortListShow = () => $('.Select-list').length !== 0
 let customButtonExist = false
+
 let buttonFactory = (buttonText) =>
     '<button class="Select-option" tabindex="-1" role="option">{}</button>'.format(buttonText)
 

@@ -1,3 +1,8 @@
+// define html template and api loc with underscore func.
+let buttonTemplate = _.template(`<button class="Select-option" tabindex="-1" role="option"><%= buttonText %></button>`)
+
+let answerApi = _.template('https://www.zhihu.com/api/v4/questions/<%= questionId %>/answers?sort_by=default&include=data%5B%2A%5D.is_normal%2Cadmin_closed_comment%2Creward_info%2Cis_collapsed%2Cannotation_action%2Cannotation_detail%2Ccollapse_reason%2Cis_sticky%2Ccollapsed_by%2Csuggest_edit%2Ccomment_count%2Ccan_comment%2Ccontent%2Ceditable_content%2Cvoteup_count%2Creshipment_settings%2Ccomment_permission%2Ccreated_time%2Cupdated_time%2Creview_info%2Crelevant_info%2Cquestion%2Cexcerpt%2Crelationship.is_authorized%2Cis_author%2Cvoting%2Cis_thanked%2Cis_nothelp%2Cupvoted_followees%3Bdata%5B%2A%5D.mark_infos%5B%2A%5D.url%3Bdata%5B%2A%5D.author.follower_count%2Cbadge%5B%3F%28type%3Dbest_answerer%29%5D.topics&limit=20&offset=<%= offset %>')
+
 let answerTemplate = _.template(`<div class="List-item">
   <div class="ContentItem AnswerItem" data-za-index="0" data-zop="{&quot;authorName&quot;:&quot;<%= authorName %>&quot;,&quot;itemId&quot;:306255466,&quot;title&quot;:&quot;经常看到美国人发短信的截图，他们没有社交软件么？&quot;,&quot;type&quot;:&quot;answer&quot;}" name="306255466" itemprop="acceptedAnswer" itemtype="http://schema.org/Answer" itemscope="" data-za-detail-view-path-module="AnswerItem" data-za-extra-module="{&quot;card&quot;:{&quot;has_image&quot;:false,&quot;has_video&quot;:false,&quot;content&quot;:{&quot;type&quot;:&quot;Answer&quot;,&quot;token&quot;:&quot;306255466&quot;,&quot;upvote_num&quot;:<%= voteUpCount %>,&quot;comment_num&quot;:62,&quot;publish_timestamp&quot;:null,&quot;parent_token&quot;:&quot;266177916&quot;,&quot;author_member_hash_id&quot;:&quot;0970f947b898ecc0ec035f9126dd4e08&quot;}}}">
     <div class="ContentItem-meta">
@@ -51,10 +56,10 @@ let answerTemplate = _.template(`<div class="List-item">
       <div>
         <div class="ContentItem-time">
           <a target="_blank" href="/question/266177916/answer/306255466">
-            <span data-tooltip="发布于 10:30">
+            <span data-tooltip="发布于 <% print(zhihuPublishTimeFormat(timestamp)) %>">
               <!-- react-text: 887 -->编辑于
               <!-- /react-text -->
-              <!-- react-text: 888 -->10:30
+              <!-- react-text: 888 --><% print(zhihuPublishTimeFormat(timestamp)) %>
               <!-- /react-text --></span></a>
         </div>
         <!-- react-empty: 889 --></div>
