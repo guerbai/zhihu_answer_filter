@@ -1,6 +1,14 @@
 // util.
 function zhihuPublishTimeFormat(timestamp) {
-    return timestamp
+    let now = moment()
+    let publishMoment = moment(timestamp*1000)
+    if (now.dayOfYear() === publishMoment.dayOfYear() && now.year() === publishMoment.year()) {
+        return publishMoment.format('HH:mm')
+    } else if (moment(now.format('YYYY-MM-DD')).to(moment(publishMoment.format('YYYY-MM-DD'))) === 'a day ago') {
+        return '昨天 ' + publishMoment.format('HH:mm')
+    } else {
+        return publishMoment.format('YYYY-MM-DD')
+    }
 }
 
 function zhihuVoteupButtonNumberFormat(num) {
