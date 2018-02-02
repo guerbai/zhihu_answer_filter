@@ -23,14 +23,10 @@ function zhihuVoteupButtonNumberFormat(num) {
 
 function cardPictureHandler(answerCardHtml) {
     let $card = $(answerCardHtml)
-    return $(answerCardHtml).find('figure img').attr('src', function () {
-        $(this).attr('data-actualsrc')
-    }).html()
-    // $(answerCardHtml).find('figure img').each(function () {
-    //     console.log($(this).attr('src'))
-    //     $(this).attr('src', $(this).attr('data-actualsrc'))
-    // })
-    return answerCardHtml
+    $card.find('figure img').attr('src', function () {
+        return $(this).attr('data-actualsrc').replace('/50/', '/80/')
+    })
+    return $card.prop('outerHTML')
 }
 
 // button.
