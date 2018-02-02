@@ -21,6 +21,18 @@ function zhihuVoteupButtonNumberFormat(num) {
     }
 }
 
+function cardPictureHandler(answerCardHtml) {
+    let $card = $(answerCardHtml)
+    return $(answerCardHtml).find('figure img').attr('src', function () {
+        $(this).attr('data-actualsrc')
+    }).html()
+    // $(answerCardHtml).find('figure img').each(function () {
+    //     console.log($(this).attr('src'))
+    //     $(this).attr('src', $(this).attr('data-actualsrc'))
+    // })
+    return answerCardHtml
+}
+
 // button.
 let customButtonExist = false
 
@@ -65,7 +77,7 @@ let hideOriginAnswerCards = () => {
 
 
 let constructCustomizeAnswerCards = (answer) => {
-    return answerTemplate({
+    let answerCardHtml = answerTemplate({
         authorName: answer.author.name,
         authorAvatarUrl: answer.author.avatar_url,
         authorHeadline: answer.author.headline,
@@ -74,6 +86,8 @@ let constructCustomizeAnswerCards = (answer) => {
         commentCount: answer.comment_count,
         timestamp: answer.updated_time,
     })
+    answerCardHtmlWithPicture = cardPictureHandler(answerCardHtml)
+    return answerCardHtmlWithPicture
 }
 
 let romanceAnswer = (answerList) => {

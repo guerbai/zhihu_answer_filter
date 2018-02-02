@@ -23,7 +23,6 @@ let getTotalAnswer = () => {
                 doneCount += 1
                 answerList = answerList.concat(response.data)
                 if (doneCount === requestCount) {
-                    console.log('nani')
                     totalAnswerGot = true
                 }
             }
