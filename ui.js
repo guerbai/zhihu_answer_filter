@@ -29,6 +29,31 @@ function cardPictureHandler(answerCardHtml) {
     return $card.prop('outerHTML')
 }
 
+function addVoteMethod(answerId) {
+    let $card = $('div[answer_id|="'+answerId+'"]')
+    let voting = $card.attr('voting')
+    $card.find('.VoteButton--up').click(function (answerId, voting) {
+        console.log(answerId)
+        return vote(answerId, voting === '1' ? 'neutral': 'up')
+
+    })
+    // $card.find('.VoteButton--up').click(vote(answerId, voting === '1' ? 'neutral': 'up'))
+        // console.log(this)
+        // let voting = $(this).attr('voting')
+        // console.log($(this).attr('voting'))
+
+    // })
+    // $('div[answer_id|='+answerId).each(function () {
+    //     console.log(1111)
+    //     let answerId = $(this).attr('answerId')
+    //     let voting = $(this).attr('voting')
+    //     console.log(answerId, voting)
+    //     console.log($(this).find('VoteButton--up'))
+    //     $(this).find('.VoteButton--up').click(vote(answerId, voting === '1' ? 'neutral': 'up'))
+    //     $(this).find('.VoteButton--down').click(vote(answerId, voting === '-1' ? 'neutral': 'down'))
+    // })
+}
+
 // button.
 let customButtonExist = false
 
@@ -81,6 +106,8 @@ let constructCustomizeAnswerCards = (answer) => {
         richTextAnswer: answer.content,
         commentCount: answer.comment_count,
         timestamp: answer.updated_time,
+        answerId: answer.id,
+        voteRelation: answer.relationship.voting,
     })
     answerCardHtmlWithPicture = cardPictureHandler(answerCardHtml)
     return answerCardHtmlWithPicture
@@ -93,4 +120,5 @@ let romanceAnswer = (answerList) => {
     }
     answerHtml += '</div>'
     $('.Card > .List > div:eq(1)').append(answerHtml)
+    addVoteMethod('310953416')
 }

@@ -1,4 +1,4 @@
-// get all answer.
+// call zhihu api.
 let answerCount = parseInt($('.List-headerText > span').text().split(' ')[0])
 let questionNo = window.location.href.split('/').pop()
 
@@ -29,6 +29,17 @@ let getTotalAnswer = () => {
         })(answerNo))
         answerNo += 20
     }
+}
+
+let vote = (answerId, voteType) => {
+    $.ajax({
+        method: 'POST',
+        url: 'https://www.zhihu.com/api/v4/' + answerId + '/voters',
+        data: {type: voteType}
+    }).done(function (response) {
+        return response.data.voteup_count
+    })
+
 }
 
 // customize func.
