@@ -1,75 +1,71 @@
-// call zhihu api.
-let answerCount = parseInt($('.List-headerText > span').text().split(' ')[0])
-let questionNo = window.location.href.split('/').pop()
+class AnswerCard {
 
-let totalAnswerGot = false
-let answerList = []
+    constructor (answer) {
+        this.answer = answer
+    }
 
-let getTotalAnswer = () => {
-    let answerNo = 0
-    requestCount = 0
-    doneCount = 0
-    while (answerNo <= answerCount) {
-        requestCount += 1
-        let url = answerApi({
-           questionId: questionNo,
-           offset: answerNo
-        })
+    vote (voteType) {
         $.ajax({
-            method: 'GET',
-            url: url,
-        }).done((function (nowAnswerNo) {
-            return function (response) {
-                doneCount += 1
-                answerList = answerList.concat(response.data)
-                if (doneCount === requestCount) {
-                    totalAnswerGot = true
-                }
-            }
-        })(answerNo))
-        answerNo += 20
+            method: 'POST',
+            url: 'https://www.zhihu.com/api/v4/answers/' + answerId + '/voters',
+            contentType: 'application/json',
+            data: JSON.stringify({type: voteType}),
+            dataType: 'json'
+        }).done(function (response) {
+            voteButtonShow(answerId, response.voteup_count, voteType)
+        })
     }
-}
 
-let vote = (answerId, voteType) => {
-    $.ajax({
-        method: 'POST',
-        url: 'https://www.zhihu.com/api/v4/' + answerId + '/voters',
-        data: {type: voteType}
-    }).done(function (response) {
-        return response.data.voteup_count
-    })
-
-}
-
-// customize func.
-let sortByVoteUpCount = () => {
-    hideOriginAnswerCards()
-    if (!totalAnswerGot) {
-        console.log('not end')
-        setTimeout(sortByVoteUpCount, 1000)
-        return
+    constructCustomizeAnswerCards (answer) {
+        let answerCardHtml = answerTemplate({
+            authorName: this.answer.author.name,
+            authorAvatarUrl: this.answer.author.avatar_url,
+            authorHeadline: this.answer.author.headline,
+            voteUpCount: this.answer.voteup_count,
+            richTextAnswer: this.answer.content,
+            commentCount: this.answer.comment_count,
+            timestamp: this.answer.updated_time,
+        })
+        answerCardHtmlWithPicture = cardPictureHandler(answerCardHtml)
+        return answerCardHtmlWithPicture
     }
-    let mostVoteUpAnswer = _.sortBy(answerList, function (answer) {
-        return -answer.voteup_count
-    }).slice(0, 50)
-    romanceAnswer(mostVoteUpAnswer)
-    console.log(mostVoteUpAnswer)
-}
 
-let filterByAuthor = () => {
-    hideOriginAnswerCards()
-    if (!totalAnswerGot) {
-        setTimeout(filterByAuthor, 1000)
-        return
+    addVoteMethod (answerId) {
+        let $card = $('div[answer_id|="'+this.answer.id+'"]')
+        let voting = $card.attr('voting')
+        let id = $card.attr('answer_id')
+        $card.find('.VoteButton--up').click(this.vote.bind(null, answerId, voting === '1' ? 'neutral': 'up'))
+        $card.find('.VoteButton--down').click(this.vote.bind(null, answerId, voting === '-1' ? 'neutral': 'down'))
     }
-    let author = prompt('请输入作者名')
-    let authorAnswer = _.filter(answerList, function (answer) {
-        return answer.author.name.indexOf(author) > -1
-    })
-    romanceAnswer(authorAnswer)
-    console.log(authorAnswer)
-    for (let answer of authorAnswer) {
-        console.log(answer.author.name)
+
+    zhihuPublishTimeFormat (timestamp) {
+        let now = moment()
+        let publishMoment = moment(timestamp*1000)
+        if (now.dayOfYear() === publishMoment.dayOfYear() && now.year() === publishMoment.year()) {
+            return publishMoment.format('HH:mm')
+        } else if (moment(now.format('YYYY-MM-DD')).to(moment(publishMoment.format('YYYY-MM-DD'))) === 'a day ago') {
+            return '昨天 ' + publishMoment.format('HH:mm')
+        } else {
+            return publishMoment.format('YYYY-MM-DD')
+        }
     }
+
+    zhihuVoteupButtonNumberFormat (num) {
+        if (num < 1000) {
+            return num
+        } else if (num > 10000) {
+            return (num/1000).toFixed(0) + 'K'
+        } else {
+            return (num/1000).toFixed(1) + 'K'
+        }
+    }
+
+    cardPictureHandler (answerCardHtml) {
+        let $card = $(answerCardHtml)
+        $card.find('figure img').attr('src', function () {
+            return $(this).attr('data-actualsrc').replace('/50/', '/80/')
+        })
+        return $card.prop('outerHTML')
+    }
+
 }
