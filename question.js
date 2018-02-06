@@ -5,10 +5,20 @@ class Button {
         this.click_func = click_func
     }
 
-    getHtml () {
-        return '<button class="Select-option" tabindex="-1" role="option">'+buttonText+'</button>'
+    embed () {
+        let buttonHtml = '<button class="Select-option" tabindex="-1" role="option">'+this.text+'</button>'
+        $('.Select-list').append(buttonHtml)
+        $('.Select-list > button:eq('+this.no+')').click(this.click_func)
+    }
+
+    static getCustomizeButtons () {
+        let voteUpSortButton = new Button('按赞数排序', 2, this.sortByVoteUpCount)
+        let authorFilterButton = new Button('按作者筛选', 3, this.filterByAuthor)
+        let buttons = [voteUpSortButton, authorFilterButton]
+        return buttons
     }
 }
+
 
 class Question {
     constructor () {
@@ -19,53 +29,40 @@ class Question {
         this.customButtonExist = false
     }
 
-    sortListShow () {
+    init () {
+        this._getTotalAnswer()
+        this._customizeButtonController()
+    }
+
+    _sortListShow () {
         return $('.Select-list').length !== 0
     }
 
-    customizeSortButton () {
-        voteUpSortButton = new Button('按赞数排序', 2, sortByVoteUpCount)
-        authorFilterButton = new Button('按作者筛选', 3, filterByAuthor)
-
-        buttons = [voteUpSortButton, authorFilterButton]
-
-        let buttonController = () => {
-            if (sortListShow() && !customButtonExist) {
-                for (let button of buttons) {
-                    $('.Select-list').append(button.getHtml())
-                    $('.Select-list > button:eq('+button.no+')').click(button.click_func)
-                }
-                customButtonExist = true
-            }
-            if (!sortListShow()) {
-                customButtonExist = false
-            }
-        }
+    _hideOriginAnswerCards () {
+        return $('.Card > .List > div:eq(1) > div').css('display', 'none')
     }
-
-    _hideOriginAnswerCards = () => {
-        $('.Card > .List > div:eq(1) > div').css('display', 'none')
-    }
-
-    getTotalAnswer () {
+    
+    _getTotalAnswer () {
+        let self = this
         let answerNo = 0
-        requestCount = 0
-        doneCount = 0
-        while (answerNo <= answerCount) {
+        let requestCount = 0
+        let doneCount = 0
+        while (answerNo <= this.answerCount) {
             requestCount += 1
             let url = answerApi({
-                questionId: questionNo,
+                questionId: this.questionNo,
                 offset: answerNo
             })
             $.ajax({
                 method: 'GET',
                 url: url,
-            }).done((function (nowAnswerNo) {
+            }).done(((nowAnswerNo) => {
                 return function (response) {
                     doneCount += 1
-                    this.answerList = answerList.concat(response.data)
+                    self.answerList = self.answerList.concat(_.map(response.data, (answer)=>new AnswerCard(answer)))
                     if (doneCount === requestCount) {
-                        totalAnswerGot = true
+                        console.log('got total answer!')
+                        self._totalAnswerGot = true
                     }
                 }
             })(answerNo))
@@ -73,43 +70,53 @@ class Question {
         }
     }
 
+    _customizeButtonController () {
+        if (this._sortListShow() && !this.customButtonExist) {
+            for (let button of Button.getCustomizeButtons()) {
+                button.embed()
+            }
+            this.customButtonExist = true
+        }
+        if (!this._sortListShow()) {
+            this.customButtonExist = false
+        }
+        setTimeout(this._customizeButtonController.bind(this), 500)
+    }
+
     sortByVoteUpCount () {
-        hideOriginAnswerCards()
-        if (!totalAnswerGot) {
+        this._hideOriginAnswerCards()
+        if (!this.totalAnswerGot) {
             console.log('not end')
-            setTimeout(sortByVoteUpCount, 1000)
+            setTimeout(this.sortByVoteUpCount, 1000)
             return
         }
-        let mostVoteUpAnswer = _.sortBy(answerList, function (answer) {
+        let mostVoteUpAnswer = _.sortBy(this.answerList, function (answer) {
             return -answer.voteup_count
         }).slice(0, 50)
-        romanceAnswer(mostVoteUpAnswer)
+        this.romanceAnswer(mostVoteUpAnswer)
         console.log(mostVoteUpAnswer)
     }
 
     filterByAuthor () {
-        hideOriginAnswerCards()
-        if (!totalAnswerGot) {
+        this._hideOriginAnswerCards()
+        if (!this.totalAnswerGot) {
             setTimeout(filterByAuthor, 1000)
             return
         }
         let author = prompt('请输入作者名')
-        let authorAnswer = _.filter(answerList, function (answer) {
+        let authorAnswer = _.filter(this.answerList, function (answer) {
             return answer.author.name.indexOf(author) > -1
         })
-        romanceAnswer(authorAnswer)
+        this.romanceAnswer(authorAnswer)
         console.log(authorAnswer)
         for (let answer of authorAnswer) {
             console.log(answer.author.name)
         }
     }
 
-    romanceAnswer () {
-        answerHtml = '<div class>'
-        for (let answer of answerList) {
-            answerHtml += constructCustomizeAnswerCards(answer)
-        }
-        answerHtml += '</div>'
+    romanceAnswer (answerList) {
+        answerHtml = '<div class>' + _.reduce(answerList,
+            (memo, answer)=>memo+answer.constructCustomizeAnswerCards(), '') + '</div>'
         $('.Card > .List > div:eq(1)').append(answerHtml)
         addVoteMethod('310953416')
     }

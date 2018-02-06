@@ -1,5 +1,4 @@
 // define html template and api loc with underscore func.
-
 let answerApi = _.template('https://www.zhihu.com/api/v4/questions/<%= questionId %>/answers?sort_by=default&include=data%5B%2A%5D.is_normal%2Cadmin_closed_comment%2Creward_info%2Cis_collapsed%2Cannotation_action%2Cannotation_detail%2Ccollapse_reason%2Cis_sticky%2Ccollapsed_by%2Csuggest_edit%2Ccomment_count%2Ccan_comment%2Ccontent%2Ceditable_content%2Cvoteup_count%2Creshipment_settings%2Ccomment_permission%2Ccreated_time%2Cupdated_time%2Creview_info%2Crelevant_info%2Cquestion%2Cexcerpt%2Crelationship.is_authorized%2Cis_author%2Cvoting%2Cis_thanked%2Cis_nothelp%2Cupvoted_followees%3Bdata%5B%2A%5D.mark_infos%5B%2A%5D.url%3Bdata%5B%2A%5D.author.follower_count%2Cbadge%5B%3F%28type%3Dbest_answerer%29%5D.topics&limit=20&offset=<%= offset %>')
 
 let answerTemplate = _.template(`<div class="List-item" answer_id=<%= answerId %> voting=<%= voteRelation %>>
@@ -320,5 +319,3 @@ let a = _.template(`<div class="List-item" data-reactid="215">
     <!-- react-empty: 781 -->
     <!-- react-empty: 332 --></div>
 </div>`)
-
-// var img = "<img src="https://pic4.zhimg.com/50/6edd0d8e130e4901e0fd58b2d72cbb7d_hd.jpg" data-rawwidth="371" data-rawheight="242" class="content_image" width="371"></noscript><img src="data:image/svg+xml;utf8,&lt;svg%20xmlns='http://www.w3.org/2000/svg'%20width='371'%20height='242'&gt;&lt;/svg&gt;" data-rawwidth="371" data-rawheight="242" class="content_image lazy" width="371" data-actualsrc="https://pic4.zhimg.com/50/6edd0d8e130e4901e0fd58b2d72cbb7d_hd.jpg"></figure><br>注：大家去某宝搜索“夹书”，“书夹子”之类的关键字，找自己喜欢的款式喜欢的价格就行啦，很好找的，这里就不打广告了，嘿嘿。"

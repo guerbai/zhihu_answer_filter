@@ -9,8 +9,7 @@
         {
             "matches": ["https://www.zhihu.com/question/*"],
             "exclude_globs": ["*answer*"],
-            "js": ["lib/jquery-3.2.1.min.js", "lib/underscore-min.js", "lib/moment.min.js", "const.js", "answer.js", "ui.js", "index.js"],
-            // "js": ["lib/moment-timezone.min.js", "index2.js"],
+            "js": ["lib/jquery-3.2.1.min.js", "lib/underscore-min.js", "lib/moment.min.js", "const.js", "question.js", "answer.js", "index.js"],
             "run_at": "document_end"
         }
     ]

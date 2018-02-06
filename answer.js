@@ -1,7 +1,7 @@
 class AnswerCard {
 
     constructor (answer) {
-        this.answer = answer
+        this.data = answer
     }
 
     vote (voteType) {
@@ -16,7 +16,7 @@ class AnswerCard {
         })
     }
 
-    constructCustomizeAnswerCards (answer) {
+    constructCustomizeAnswerCards () {
         let answerCardHtml = answerTemplate({
             authorName: this.answer.author.name,
             authorAvatarUrl: this.answer.author.avatar_url,

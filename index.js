@@ -1,5 +1,1 @@
-getTotalAnswer()
-setInterval(buttonController, 500)
-let question = Question()
-question.getTotalAnswer()
-setInterval(buttonController, 500)
+new Question().init()
