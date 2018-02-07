@@ -12,21 +12,41 @@ class AnswerCard {
     authorNameContainSearchStr (searchStr) {
          return this.data.author.name.indexOf(searchStr) > -1
     }
+
+    _getVoteType (buttonType) {
+        let voteType
+        if (buttonType === '1') {
+            voteType = this.data.voting === '1' ? 'neutral': 'up'
+        } else if (buttonType === '-1') {
+            voteType = this.data.voting === '-1' ? 'neutral': 'down'
+        }
+        if (voteType === 'neutral') {
+            this.data.voting = '0'
+        } else if (voteType === 'up') {
+            this.data.voting = '1'
+        } else if (voteType === 'down') {
+            this.data.voting = '-1'
+        }
+        return voteType
+    }
     
-    vote (voteType) {
+    vote (buttonType) {
+        let voteType = this._getVoteType(buttonType)
         $.ajax({
             method: 'POST',
-            url: 'https://www.zhihu.com/api/v4/answers/' + answerId + '/voters',
+            url: 'https://www.zhihu.com/api/v4/answers/' + this.data.id + '/voters',
             contentType: 'application/json',
             data: JSON.stringify({type: voteType}),
             dataType: 'json'
         }).done(function (response) {
-            voteButtonShow(answerId, response.voteup_count, voteType)
+            console.log(response)
+            // voteButtonShow(answerId, response.voteup_count, voteType)
         })
     }
 
     constructCustomizeAnswerCards () {
         this.html = answerTemplate({
+            answerId: this.data.id,
             authorName: this.data.author.name,
             authorAvatarUrl: this.data.author.avatar_url,
             authorHeadline: this.data.author.headline,
@@ -39,12 +59,11 @@ class AnswerCard {
         return this.html
     }
 
-    addVoteMethod (answerId) {
-        let $card = $('div[answer_id|="'+this.answer.id+'"]')
-        let voting = $card.attr('voting')
-        let id = $card.attr('answer_id')
-        $card.find('.VoteButton--up').click(this.vote.bind(null, answerId, voting === '1' ? 'neutral': 'up'))
-        $card.find('.VoteButton--down').click(this.vote.bind(null, answerId, voting === '-1' ? 'neutral': 'down'))
+    addVoteMethod () {
+        let $card = $('div[answer_id|="'+this.data.id+'"]')
+        let voting = this.data.relationship.voting
+        $card.find('.VoteButton--up').click(this.vote.bind(this, '1'))
+        $card.find('.VoteButton--down').click(this.vote.bind(this, '-1'))
     }
 
     static zhihuPublishTimeFormat (timestamp) {

@@ -29,6 +29,7 @@ class Button {
         let answerHtml = '<div class>' + _.reduce(answerList,
             (memo, answer)=>memo+answer.constructCustomizeAnswerCards(), '') + '</div>'
         $('.Card > .List > div:eq(1)').append(answerHtml)
+        _.map(answerList, (answer)=>answer.addVoteMethod())
     }
 }
 
