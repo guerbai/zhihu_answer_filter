@@ -12,21 +12,42 @@ class Button {
     }
 
     static getCustomizeButtons () {
-        let voteUpSortButton = new Button('按赞数排序', 2, this.sortByVoteUpCount)
-        let authorFilterButton = new Button('按作者筛选', 3, this.filterByAuthor)
+        let voteUpSortButton = new Button('按赞数排序', 2, Button.romanceAnswer.bind(null, Question.sortByVoteUpCount))
+        let authorFilterButton = new Button('按作者筛选', 3, Button.romanceAnswer.bind(null, Question.filterByAuthor))
         let buttons = [voteUpSortButton, authorFilterButton]
         return buttons
+    }
+
+    static romanceAnswer (sortFunc) {
+        if (!Question.totalAnswerGot()) {
+            console.log('not end')
+            setTimeout(Button.romanceAnswer.bind(null, sortFunc), 1000)
+            return
+        }
+        Question.hideOriginAnswerCards()
+        let answerList = sortFunc()
+        let answerHtml = '<div class>' + _.reduce(answerList,
+            (memo, answer)=>memo+answer.constructCustomizeAnswerCards(), '') + '</div>'
+        $('.Card > .List > div:eq(1)').append(answerHtml)
     }
 }
 
 
 class Question {
     constructor () {
+        if (questionInstance) {
+            return questionInstance
+        } 
         this.answerCount = parseInt($('.List-headerText > span').text().split(' ')[0])
         this.questionNo = window.location.href.split('/').pop()
         this.totalAnswerGot = false
         this.answerList = []
         this.customButtonExist = false
+        questionInstance = this
+    }
+
+    static getInstance () {
+        return questionInstance
     }
 
     init () {
@@ -34,12 +55,20 @@ class Question {
         this._customizeButtonController()
     }
 
-    _sortListShow () {
+    static sortListShow () {
         return $('.Select-list').length !== 0
     }
 
-    _hideOriginAnswerCards () {
+    static hideOriginAnswerCards () {
         return $('.Card > .List > div:eq(1) > div').css('display', 'none')
+    }
+
+    static getAnswerList () {
+        return Question.getInstance().answerList
+    }
+
+    static totalAnswerGot() {
+        return Question.getInstance()._totalAnswerGot
     }
     
     _getTotalAnswer () {
@@ -71,53 +100,36 @@ class Question {
     }
 
     _customizeButtonController () {
-        if (this._sortListShow() && !this.customButtonExist) {
+        if (Question.sortListShow() && !this.customButtonExist) {
             for (let button of Button.getCustomizeButtons()) {
                 button.embed()
             }
             this.customButtonExist = true
         }
-        if (!this._sortListShow()) {
+        if (!Question.sortListShow()) {
             this.customButtonExist = false
         }
         setTimeout(this._customizeButtonController.bind(this), 500)
     }
 
-    sortByVoteUpCount () {
-        this._hideOriginAnswerCards()
-        if (!this.totalAnswerGot) {
-            console.log('not end')
-            setTimeout(this.sortByVoteUpCount, 1000)
-            return
-        }
-        let mostVoteUpAnswer = _.sortBy(this.answerList, function (answer) {
-            return -answer.voteup_count
+    static sortByVoteUpCount () {
+        let answerList = Question.getInstance().answerList
+        let mostVoteUpAnswer = _.sortBy(answerList, function (answer) {
+            return -answer.getVoteUpCount()
         }).slice(0, 50)
-        this.romanceAnswer(mostVoteUpAnswer)
-        console.log(mostVoteUpAnswer)
+        return mostVoteUpAnswer
     }
 
-    filterByAuthor () {
-        this._hideOriginAnswerCards()
-        if (!this.totalAnswerGot) {
-            setTimeout(filterByAuthor, 1000)
-            return
-        }
+    static filterByAuthor () {
+        let answerList = Question.getInstance().answerList
         let author = prompt('请输入作者名')
-        let authorAnswer = _.filter(this.answerList, function (answer) {
-            return answer.author.name.indexOf(author) > -1
+        let authorAnswer = _.filter(answerList, function (answer) {
+            return answer.authorNameContainSearchStr(author)
         })
-        this.romanceAnswer(authorAnswer)
-        console.log(authorAnswer)
-        for (let answer of authorAnswer) {
-            console.log(answer.author.name)
-        }
+        return authorAnswer
     }
 
-    romanceAnswer (answerList) {
-        answerHtml = '<div class>' + _.reduce(answerList,
-            (memo, answer)=>memo+answer.constructCustomizeAnswerCards(), '') + '</div>'
-        $('.Card > .List > div:eq(1)').append(answerHtml)
-        addVoteMethod('310953416')
-    }
 }
+
+// poor singleton.
+let questionInstance = null;

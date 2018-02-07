@@ -2,8 +2,17 @@ class AnswerCard {
 
     constructor (answer) {
         this.data = answer
+        this.html = ''
     }
 
+    getVoteUpCount () {
+        return this.data.voteup_count
+    }
+
+    authorNameContainSearchStr (searchStr) {
+         return this.data.author.name.indexOf(searchStr) > -1
+    }
+    
     vote (voteType) {
         $.ajax({
             method: 'POST',
@@ -17,17 +26,17 @@ class AnswerCard {
     }
 
     constructCustomizeAnswerCards () {
-        let answerCardHtml = answerTemplate({
-            authorName: this.answer.author.name,
-            authorAvatarUrl: this.answer.author.avatar_url,
-            authorHeadline: this.answer.author.headline,
-            voteUpCount: this.answer.voteup_count,
-            richTextAnswer: this.answer.content,
-            commentCount: this.answer.comment_count,
-            timestamp: this.answer.updated_time,
+        this.html = answerTemplate({
+            authorName: this.data.author.name,
+            authorAvatarUrl: this.data.author.avatar_url,
+            authorHeadline: this.data.author.headline,
+            voteUpCount: this.data.voteup_count,
+            richTextAnswer: this.data.content,
+            commentCount: this.data.comment_count,
+            timestamp: this.data.updated_time,
         })
-        answerCardHtmlWithPicture = cardPictureHandler(answerCardHtml)
-        return answerCardHtmlWithPicture
+        this.cardPictureHandler()
+        return this.html
     }
 
     addVoteMethod (answerId) {
@@ -38,7 +47,7 @@ class AnswerCard {
         $card.find('.VoteButton--down').click(this.vote.bind(null, answerId, voting === '-1' ? 'neutral': 'down'))
     }
 
-    zhihuPublishTimeFormat (timestamp) {
+    static zhihuPublishTimeFormat (timestamp) {
         let now = moment()
         let publishMoment = moment(timestamp*1000)
         if (now.dayOfYear() === publishMoment.dayOfYear() && now.year() === publishMoment.year()) {
@@ -50,7 +59,7 @@ class AnswerCard {
         }
     }
 
-    zhihuVoteupButtonNumberFormat (num) {
+    static zhihuVoteupButtonNumberFormat (num) {
         if (num < 1000) {
             return num
         } else if (num > 10000) {
@@ -60,12 +69,11 @@ class AnswerCard {
         }
     }
 
-    cardPictureHandler (answerCardHtml) {
-        let $card = $(answerCardHtml)
+    cardPictureHandler () {
+        let $card = $(this.html)
         $card.find('figure img').attr('src', function () {
             return $(this).attr('data-actualsrc').replace('/50/', '/80/')
         })
-        return $card.prop('outerHTML')
+        this.html = $card.prop('outerHTML')
     }
-
 }
