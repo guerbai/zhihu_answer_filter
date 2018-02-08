@@ -29,7 +29,7 @@ class Button {
         let answerHtml = '<div class>' + _.reduce(answerList,
             (memo, answer)=>memo+answer.constructCustomizeAnswerCards(), '') + '</div>'
         $('.Card > .List > div:eq(1)').append(answerHtml)
-        _.map(answerList, (answer)=>answer.addVoteMethod())
+        _.map(answerList, (answer)=>answer.recover())
     }
 }
 
@@ -127,6 +127,7 @@ class Question {
         let authorAnswer = _.filter(answerList, function (answer) {
             return answer.authorNameContainSearchStr(author)
         })
+        console.log(authorAnswer)
         return authorAnswer
     }
 

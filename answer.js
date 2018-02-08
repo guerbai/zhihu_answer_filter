@@ -5,6 +5,31 @@ class AnswerCard {
         this.html = ''
     }
 
+    recover () {
+        this.addVoteMethod()
+        this.addThanksMethod()
+
+    }
+
+    addThanksMethod () {
+        let $card = $('div[answer_id|="'+this.data.id+'"]')
+        let thanksButton = $card.find('button:has(svg.Zi--Heart)')
+        let isThanked = () => this.data.relationship.is_thanked
+        let method = () => isThanked() ? 'DELETE': 'POST'
+        let toText = () => isThanked() ? ['取消感谢', '感谢']: ['感谢', '取消感谢']
+        
+        thanksButton.click(()=>{
+            $.ajax({
+                method: method(),
+                url: 'https://www.zhihu.com/api/v4/answers/'+this.data.id+'/thankers'
+            }).done((response) => {
+                this.data.relationship.is_thanked = response.is_thanked
+                let [nextText, replacedText] = toText()
+                thanksButton.html(thanksButton.html().replace(replacedText, nextText))
+            })
+        })
+    }
+
     getVoteUpCount () {
         return this.data.voteup_count
     }
@@ -20,13 +45,6 @@ class AnswerCard {
         } else if (buttonType === '-1') {
             voteType = this.data.voting === '-1' ? 'neutral': 'down'
         }
-        if (voteType === 'neutral') {
-            this.data.voting = '0'
-        } else if (voteType === 'up') {
-            this.data.voting = '1'
-        } else if (voteType === 'down') {
-            this.data.voting = '-1'
-        }
         return voteType
     }
     
@@ -38,8 +56,10 @@ class AnswerCard {
             contentType: 'application/json',
             data: JSON.stringify({type: voteType}),
             dataType: 'json'
-        }).done(function (response) {
+        }).done((response) => {
+            this.data.voting = response.voting
             console.log(response)
+
             // voteButtonShow(answerId, response.voteup_count, voteType)
         })
     }
@@ -54,6 +74,7 @@ class AnswerCard {
             richTextAnswer: this.data.content,
             commentCount: this.data.comment_count,
             timestamp: this.data.updated_time,
+            isThanked: this.data.relationship.is_thanked,
         })
         this.cardPictureHandler()
         return this.html
@@ -94,5 +115,9 @@ class AnswerCard {
             return $(this).attr('data-actualsrc').replace('/50/', '/80/')
         })
         this.html = $card.prop('outerHTML')
+    }
+
+    static zhihuThankText (isThanked) {
+        return isThanked ? '取消感谢': '感谢'
     }
 }
