@@ -1,8 +1,7 @@
 class Button {
-    constructor (text, no, click_func) {
+    constructor (text, no) {
         this.text = text
         this.no = no
-        this.click_func = click_func
     }
 
     embed () {
@@ -11,9 +10,15 @@ class Button {
         $('.Select-list > button:eq('+this.no+')').click(this.click_func)
     }
 
+    addClickFunc (func) {
+        this.click_func = func
+    }
+
     static getCustomizeButtons () {
-        let voteUpSortButton = new Button('按赞数排序', 2, Button.romanceAnswer.bind(null, Question.sortByVoteUpCount))
-        let authorFilterButton = new Button('按作者筛选', 3, Button.romanceAnswer.bind(null, Question.filterByAuthor))
+        let voteUpSortButton = new Button('按赞数排序', 2)
+        let authorFilterButton = new Button('按作者筛选', 3)
+        voteUpSortButton.addClickFunc(Button.romanceAnswer.bind(voteUpSortButton, Question.sortByVoteUpCount))
+        authorFilterButton.addClickFunc(Button.romanceAnswer.bind(authorFilterButton, Question.filterByAuthor))
         let buttons = [voteUpSortButton, authorFilterButton]
         return buttons
     }
@@ -30,6 +35,8 @@ class Button {
             (memo, answer)=>memo+answer.constructCustomizeAnswerCards(), '') + '</div>'
         $('.Card > .List > div:eq(1)').append(answerHtml)
         _.map(answerList, (answer)=>answer.recover())
+        console.log($('.Select-plainButton'))
+        $('.Select-plainButton').text(this.text)
     }
 }
 
