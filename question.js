@@ -1,3 +1,15 @@
+$.prototype.replaceChildText = function (text) {
+    let textNodes = this.contents().filter(function() {
+        return this.nodeType === 3
+    })
+
+    textNodes.each(function() {
+        if (this.nodeValue.trim() !== '') {
+            this.nodeValue = text
+        }
+    })
+}
+
 class Button {
     constructor (text, no) {
         this.text = text
@@ -26,7 +38,7 @@ class Button {
     static romanceAnswer (sortFunc) {
         if (!Question.totalAnswerGot()) {
             console.log('not end')
-            setTimeout(Button.romanceAnswer.bind(null, sortFunc), 1000)
+            setTimeout(Button.romanceAnswer.bind(this, sortFunc), 1000)
             return
         }
         Question.hideOriginAnswerCards()
@@ -36,7 +48,7 @@ class Button {
         $('.Card > .List > div:eq(1)').append(answerHtml)
         _.map(answerList, (answer)=>answer.recover())
         console.log($('.Select-plainButton'))
-        $('.Select-plainButton').text(this.text)
+        $('.Select-plainButton').replaceChildText(this.text)
     }
 }
 

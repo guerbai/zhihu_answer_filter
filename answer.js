@@ -17,7 +17,7 @@ class AnswerCard {
         let isThanked = () => this.data.relationship.is_thanked
         let method = () => isThanked() ? 'DELETE': 'POST'
         let toText = () => isThanked() ? ['取消感谢', '感谢']: ['感谢', '取消感谢']
-        
+
         thanksButton.click(()=>{
             $.ajax({
                 method: method(),
@@ -25,7 +25,7 @@ class AnswerCard {
             }).done((response) => {
                 this.data.relationship.is_thanked = response.is_thanked
                 let [nextText, replacedText] = toText()
-                thanksButton.html(thanksButton.html().replace(replacedText, nextText))
+                thanksButton.replaceChildText(nextText)
             })
         })
     }
