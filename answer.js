@@ -38,30 +38,37 @@ class AnswerCard {
          return this.data.author.name.indexOf(searchStr) > -1
     }
 
-    _getVoteType (buttonType) {
-        let voteType
-        if (buttonType === '1') {
-            voteType = this.data.voting === '1' ? 'neutral': 'up'
-        } else if (buttonType === '-1') {
-            voteType = this.data.voting === '-1' ? 'neutral': 'down'
+    addVoteMethod () {
+        function voteMeta (upOrDown) {
+            let self = this
+            return function () {
+                let voting = self.data.relationship.voting.toString()
+                let voteType
+                if (upOrDown === 'up') {
+                    voteType = voting === '1' ? 'neutral': 'up'
+                } else if (upOrDown === 'down') {
+                    voteType = voting === '-1' ? 'neutral': 'down'
+                }
+                $.ajax({
+                    method: 'POST',
+                    url: 'https://www.zhihu.com/api/v4/answers/' + self.data.id + '/voters',
+                    contentType: 'application/json',
+                    data: JSON.stringify({type: voteType}),
+                    dataType: 'json'
+                }).done((response) => {
+                    self.data.relationship.voting = response.voting
+                    console.log(response)
+                    voteUpBtn.replaceChildText(response.voteup_count)
+                    // voteButtonShow(answerId, response.voteup_count, voteType)
+                })
+            }
         }
-        return voteType
-    }
-    
-    vote (buttonType) {
-        let voteType = this._getVoteType(buttonType)
-        $.ajax({
-            method: 'POST',
-            url: 'https://www.zhihu.com/api/v4/answers/' + this.data.id + '/voters',
-            contentType: 'application/json',
-            data: JSON.stringify({type: voteType}),
-            dataType: 'json'
-        }).done((response) => {
-            this.data.voting = response.voting
-            console.log(response)
-
-            // voteButtonShow(answerId, response.voteup_count, voteType)
-        })
+        let $card = $('div[answer_id|="'+this.data.id+'"]')
+        let vote = voteMeta.bind(this)
+        let voteUpBtn = $card.find('.VoteButton--up')
+        let voteDownBtn = $card.find('.VoteButton--down')
+        voteUpBtn.click(vote('up'))
+        voteDownBtn.click(vote('down'))
     }
 
     constructCustomizeAnswerCards () {
@@ -78,13 +85,6 @@ class AnswerCard {
         })
         this.cardPictureHandler()
         return this.html
-    }
-
-    addVoteMethod () {
-        let $card = $('div[answer_id|="'+this.data.id+'"]')
-        let voting = this.data.relationship.voting
-        $card.find('.VoteButton--up').click(this.vote.bind(this, '1'))
-        $card.find('.VoteButton--down').click(this.vote.bind(this, '-1'))
     }
 
     static zhihuPublishTimeFormat (timestamp) {
