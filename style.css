@@ -1,0 +1,17 @@
+.neutral {
+    color: #0184ff !important;
+    background: #e8f3ff !important;
+}
+
+.netural > path {
+    background: #0184ff !important;
+}
+
+.vote {
+    color: #ffffff !important;
+    background: #0184ff !important;
+}
+
+.vote > path {
+    background: #ffffff !important;
+}

@@ -63,7 +63,7 @@ let answerTemplate = _.template(`<div class="List-item" answer_id="<%= answerId 
         <!-- react-empty: 889 --></div>
       <div class="ContentItem-actions">
         <span>
-          <button class="Button VoteButton VoteButton--up" aria-label="赞同" type="button">
+          <button class="Button VoteButton VoteButton--up <% print(voting==='1'?'vote':'neutral') %>" aria-label="赞同" type="button">
             <svg viewBox="0 0 20 18" class="Icon VoteButton-upIcon Icon--triangle" width="9" height="16" aria-hidden="true" style="height: 16px; width: 9px;">
               <title></title>
               <g>
@@ -72,7 +72,7 @@ let answerTemplate = _.template(`<div class="List-item" answer_id="<%= answerId 
             </svg>
             <!-- react-text: 1061 --><% print(AnswerCard.zhihuVoteupButtonNumberFormat(voteUpCount)) %>
             <!-- /react-text --></button>
-          <button class="Button VoteButton VoteButton--down" aria-label="反对" type="button">
+          <button class="Button VoteButton VoteButton--down <% print(voting==='-1'?'vote':'neutral') %>" aria-label="反对" type="button">
             <svg viewBox="0 0 20 18" class="Icon VoteButton-downIcon Icon--triangle" width="9" height="16" aria-hidden="true" style="height: 16px; width: 9px;">
               <title></title>
               <g>

@@ -44,10 +44,22 @@ class AnswerCard {
             return function () {
                 let voting = self.data.relationship.voting.toString()
                 let voteType
+                let addClass
+                let changeBtn
+                let removeClass
                 if (upOrDown === 'up') {
                     voteType = voting === '1' ? 'neutral': 'up'
+                    changeBtn = voteUpBtn
                 } else if (upOrDown === 'down') {
                     voteType = voting === '-1' ? 'neutral': 'down'
+                    changeBtn = voteDownBtn
+                }
+                if (voteType === 'neutral') {
+                    addClass = 'neutral'
+                    removeClass = 'vote'
+                } else {
+                    addClass = 'vote'
+                    removeClass = 'neutral'
                 }
                 $.ajax({
                     method: 'POST',
@@ -58,8 +70,13 @@ class AnswerCard {
                 }).done((response) => {
                     self.data.relationship.voting = response.voting
                     console.log(response)
-                    voteUpBtn.replaceChildText(response.voteup_count)
-                    // voteButtonShow(answerId, response.voteup_count, voteType)
+                    voteUpBtn.replaceChildText(AnswerCard.zhihuVoteupButtonNumberFormat(response.voteup_count))
+                    voteUpBtn.removeClass('vote')
+                    voteUpBtn.removeClass('neutral')
+                    voteDownBtn.removeClass('vote')
+                    voteDownBtn.removeClass('neutral')
+                    changeBtn.addClass(addClass)
+                    changeBtn.removeClass(removeClass)
                 })
             }
         }
@@ -82,6 +99,7 @@ class AnswerCard {
             commentCount: this.data.comment_count,
             timestamp: this.data.updated_time,
             isThanked: this.data.relationship.is_thanked,
+            voting: this.data.relationship.voting.toString()
         })
         this.cardPictureHandler()
         return this.html
