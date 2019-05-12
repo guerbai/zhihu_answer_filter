@@ -31,23 +31,22 @@ class Button {
         let authorFilterButton = new Button('按作者筛选', 3)
         voteUpSortButton.addClickFunc(Button.romanceAnswer.bind(voteUpSortButton, Question.sortByVoteUpCount))
         authorFilterButton.addClickFunc(Button.romanceAnswer.bind(authorFilterButton, Question.filterByAuthor))
-        let buttons = [voteUpSortButton, authorFilterButton]
-        return buttons
+        return [voteUpSortButton, authorFilterButton]
     }
 
     static romanceAnswer (sortFunc) {
         if (!Question.totalAnswerGot()) {
+            Question.getInstance().getTotalAnswer()
             console.log('not end')
             setTimeout(Button.romanceAnswer.bind(this, sortFunc), 1000)
             return
         }
         Question.hideOriginAnswerCards()
         let answerList = sortFunc()
-        let answerHtml = '<div class>' + _.reduce(answerList,
-            (memo, answer)=>memo+answer.constructCustomizeAnswerCards(), '') + '</div>'
-        $('.Card > .List > div:eq(1)').append(answerHtml)
-        _.map(answerList, (answer)=>answer.recover())
-        console.log($('.Select-plainButton'))
+        $('.Card > .List > div:eq(1) > div').css('display', 'none')
+        for (let answer in answerList) {
+            $('.Card > .List > div:eq(1)').prepend(answer)
+        }
         $('.Select-plainButton').replaceChildText(this.text)
     }
 }
@@ -71,7 +70,7 @@ class Question {
     }
 
     init () {
-        this._getTotalAnswer()
+        // this.getTotalAnswer()
         this._customizeButtonController()
     }
 
@@ -91,32 +90,29 @@ class Question {
         return Question.getInstance()._totalAnswerGot
     }
     
-    _getTotalAnswer () {
+    getTotalAnswer () {
         let self = this
-        let answerNo = 0
-        let requestCount = 0
-        let doneCount = 0
-        while (answerNo <= this.answerCount) {
-            requestCount += 1
-            let url = answerApi({
-                questionId: this.questionNo,
-                offset: answerNo
-            })
-            $.ajax({
-                method: 'GET',
-                url: url,
-            }).done(((nowAnswerNo) => {
-                return function (response) {
-                    doneCount += 1
-                    self.answerList = self.answerList.concat(_.map(response.data, (answer)=>new AnswerCard(answer)))
-                    if (doneCount === requestCount) {
-                        console.log('got total answer!')
-                        self._totalAnswerGot = true
-                    }
-                }
-            })(answerNo))
-            answerNo += 20
-        }
+        let y = 100000
+        let numTrail = 0
+        let startAt = new Date()
+        let myInterval = setInterval(()=>{
+            let height1 = window.pageYOffset
+            window.scrollTo(0, y)
+            let height2 = window.pageYOffset
+            if (height1 !== height2) {
+                numTrail = 0
+            }
+            y += 100000
+            if (numTrail === 25 || new Date() - startAt> 60000) {
+                console.log(new Date() - startAt)
+                clearInterval(myInterval)
+                self.totalAnswerGot = true
+                $('.Card > .List > div:eq(1) > div > .List-item').each(function () {
+                    self.answerList.concat($(this).detach())
+                })
+            }
+            numTrail += 1
+        }, 200)
     }
 
     _customizeButtonController () {

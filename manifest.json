@@ -10,7 +10,7 @@
             "matches": ["https://www.zhihu.com/question/*"],
             "exclude_globs": ["*answer*"],
             "css": ["style.css"],
-            "js": ["lib/jquery-3.2.1.min.js", "lib/underscore-min.js", "lib/moment.min.js", "index2.js"],
+            "js": ["lib/jquery-3.2.1.min.js", "lib/underscore-min.js", "lib/moment.min.js", "question.js", "index2.js"],
             "run_at": "document_end"
         }
     ]
